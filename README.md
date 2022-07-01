@@ -7,4 +7,4 @@ Running the script in an empty folder/directory will install the latest bedrock 
 
 Requirements: requests.
 
-Note: make sure to backup you're stuff in case anything goes wrong :).
+Note: Make sure before running the script that the server is stopped. Don't forget to backup you're stuff in case anything goes wrong :). 
