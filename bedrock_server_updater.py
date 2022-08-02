@@ -48,7 +48,7 @@ def main():
 
     # Extracting the minecraft-server zip file while not overwriting configuration files.
     with ZipFile(os.path.join(cwd, file),"r") as zip_ref:
-        config_files = [f for f in os.listdir(cwd) if os.path.isfile(os.path.join(cwd, f)) and f.split(".")[1] in ("json", "properties")]
+        config_files = ["server.properties", "allowlist.json", "permissions.json"]
         
         for member in zip_ref.namelist():
             if member not in config_files:
