@@ -5,18 +5,18 @@ from zipfile import ZipFile
 def main():
     print("Gathering resources...")
 
-    # Current working directory
+    # Current working directory.
     cwd = os.path.dirname(__file__)
 
     # Faking a browser visit because minecraft.net blocks python requests and wget etc.
-    # List of User-Agent strings: http://www.useragentstring.com/pages/useragentstring.php
+    # List of User-Agent strings: http://www.useragentstring.com/pages/useragentstring.php.
     header = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36"}
     response = requests.get("https://www.minecraft.net/en-us/download/server/bedrock", headers=header)
 
-    # Creating an HTML file and writing the web request content to it 
+    # Creating an HTML file and writing the web request content to it.
     open(os.path.join(cwd, "page.html"), "wb").write(response.content)
     
-    # Opening the HTML file and extracting the minecraft-server link 
+    # Opening the HTML file and extracting the minecraft-server link.
     with open(os.path.join(cwd, "page.html"), "r", encoding="utf8") as page:
         html = page.read()
 
@@ -27,14 +27,14 @@ def main():
             
         file = re.findall("bedrock-server.*.zip", file_url)[0]
 
-    # Checking if the latest minecraf-server zip file is already installed
+    # Checking if the latest minecraf-server zip file is already installed.
     if os.path.exists(os.path.join(cwd, file)):
         os.remove(os.path.join(cwd, "page.html"))
         sys.exit("You already have the latest version installed.")
 
-    print("Updating bedrock-server...")
+    print("Updating bedrock-server... (this may take a while)")
 
-    # Deleting the old minecraft-server zip file
+    # Deleting the old minecraft-server zip file.
     for dir_file in os.listdir(cwd):
         if ".zip" in dir_file:
             os.remove(os.path.join(cwd, dir_file))
@@ -42,19 +42,19 @@ def main():
     # Deleting the HTML file
     os.remove(os.path.join(cwd, "page.html"))
 
-    # Downloading the latest minecraft-server file
+    # Downloading the latest minecraft-server file.
     response = requests.get(file_url)
     open(os.path.join(cwd, file), "wb").write(response.content)
 
-    # Deleting the old minecraft-server
-    if os.path.exists(os.path.join(cwd, "bedrock-server")):
-        os.remove(os.path.join(cwd, "bedrock-server"))
-
-    # Extracting the minecraft-server zip file
+    # Extracting the minecraft-server zip file while not overwriting configuration files.
     with ZipFile(os.path.join(cwd, file),"r") as zip_ref:
-        zip_ref.extractall(cwd)
+        config_files = [f for f in os.listdir(cwd) if os.path.isfile(os.path.join(cwd, f)) and f.split(".")[1] in ("json", "properties")]
+        
+        for member in zip_ref.namelist():
+            if member not in config_files:
+                zip_ref.extract(member, cwd)
 
-    input("Update successful. Press [Enter] to exit.")
+    print("Update successful.")
 
 
 if __name__ == "__main__":
